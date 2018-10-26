@@ -25,7 +25,7 @@ describe(
       });
 
       it('should contain search result for "hero search"', async () => {
-        await page.type('input[id=search-box]', 'Mr. Nice', {delay: 20});
+        await page.type('input[id=search-box]', 'Mr. Nice');
         await page.waitForSelector('.search-result');
         const result = await page.$eval('.search-result', (element) => {
           return element.innerHTML
@@ -35,9 +35,30 @@ describe(
     });
 
     describe('Adding a New Hero', () => {
+
       it('should contain button "Heroes"', async () => {
         expect(await page.$('a[href="/heroes"]')).toBeDefined();
-      })
+      });
+
+      // Click that button to create a new hero
+      it('should navigate to page "heroes"', async () => {
+        await page.click('a[href="/heroes"]');
+        await page.waitForSelector('.delete-button');
+        expect(await page.$('.delete-button')).toBeDefined();
+      });
+
+      it('should type and save a new "hero"', async() => {
+        const myButtons = await page.$$('button');
+        for (let button of myButtons) {
+          const iHtml = await page.evaluate(el => el.innerHTML, button);
+          if (iHtml == 'Add New Hero') {
+            await button.click();
+            break;
+          }
+        }
+        expect(await page.waitForSelector('input[placeholder="name"]')).toBeDefined();
+      });
+      
     });
 
   },
